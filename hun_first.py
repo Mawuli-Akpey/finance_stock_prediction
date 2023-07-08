@@ -13,4 +13,4 @@ ticker = st.selectbox('Select a stock ticker', tickers)
 date = st.date_input('Select a date for prediction')
 
 # Display the prediction
-st.write(f'The predicted stock price for {ticker} on {date} is)
+#st.write(f'The predicted stock price for {ticker} on {date} is)
