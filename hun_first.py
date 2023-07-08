@@ -1,5 +1,8 @@
 import streamlit as st
 
+st.header("My Header")
+st.subheader("Another header")
+
 st.title("Stock Price Predictor")
 st.write("This application predicts stock prices using a trained neural network model.")
 
