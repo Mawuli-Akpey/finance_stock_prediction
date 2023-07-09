@@ -62,7 +62,7 @@ if st.button('Predict'):
     # Check if the downloaded data has enough data points
     if len(data) < seq_length:
         st.write('Not enough data to make a prediction. Please select a different date or ticker.')
-        return
+        st.stop()
 
     # Preprocess the data
     data = preprocess_data(data['Close'])
@@ -72,7 +72,7 @@ if st.button('Predict'):
         prediction = model.predict(data)
     except Exception as e:
         st.write('An error occurred during the prediction: ', e)
-        return
+        st.stop()
 
     # Convert the prediction to the original price scale
     prediction = scaler.inverse_transform(prediction)
