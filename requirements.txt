@@ -4,3 +4,4 @@ tensorflow
 numpy
 pandas
 sklearn
+matplotlib.pyplot
