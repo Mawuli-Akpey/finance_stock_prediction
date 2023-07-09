@@ -4,6 +4,7 @@ import streamlit as st
 from keras.models import load_model
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
+import pandas as pd
 import pandas_market_calendars as mcal
 
 # Load the trained CNN model
@@ -44,36 +45,24 @@ def preprocess_data(data):
     
     return X
 
-# Function to check if a date is a valid trading day
-def is_trading_day(date):
-    nyse = mcal.get_calendar('NYSE')
-    trading_days = nyse.valid_days(start_date='2018-01-01', end_date=date)
-    return np.isin([date], trading_days)
-
 if st.button('Predict'):
-    # Check if the selected date is a valid trading day
-    if not is_trading_day(date):
-        st.write('The selected date is not a valid trading day. Please select a different date.')
-        st.stop()
+    # Get the date 60 days before the selected date
+    start_date = date - pd.DateOffset(days=seq_length)
 
-    # Download the data
-    data = yf.download(ticker, end=date, periods='1y')
-
-    # Check if the downloaded data has enough data points
+    # Download the data from the start date to the selected date
+    data = yf.download(ticker, start=start_date, end=date)
+    
+    # Check if there are enough data points
     if len(data) < seq_length:
-        st.write('Not enough data to make a prediction. Please select a different date or ticker.')
+        st.write('Not enough historical data to make a prediction. Please select a different date.')
         st.stop()
 
     # Preprocess the data
     data = preprocess_data(data['Close'])
 
     # Use the CNN model to predict the stock price
-    try:
-        prediction = model.predict(data)
-    except Exception as e:
-        st.write('An error occurred during the prediction: ', e)
-        st.stop()
-
+    prediction = model.predict(data)
+    
     # Convert the prediction to the original price scale
     prediction = scaler.inverse_transform(prediction)
     
