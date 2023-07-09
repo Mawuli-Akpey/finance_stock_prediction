@@ -43,5 +43,5 @@ if st.button('Predict'):
   # Display the predictions
   st.line_chart(predictions)
   
-   # Display the prediction
-   st.write(f'The predicted stock price for {ticker} on {date} is {prediction[-1][0]}')
+  # Display the prediction
+  st.write(f'The predicted stock price for {ticker} on {date} is {prediction[-1][0]}')
