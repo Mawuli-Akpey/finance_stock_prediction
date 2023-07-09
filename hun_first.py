@@ -11,7 +11,7 @@ import pandas_market_calendars as mcal
 model = load_model('cnn_model.h5')
 
 # Define the sequence length and the scaler
-seq_length = 60
+seq_length = 5
 scaler = MinMaxScaler(feature_range=(0, 1))
 
 st.header("My Header")
