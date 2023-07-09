@@ -24,7 +24,7 @@ date = st.date_input('Select a date for prediction')
 
 
 if st.button('Predict'):
-  data = yf.download(ticker, end=date, periods='1y')
+  data = yf.download(ticker, end=date.strftime('%Y-%m-%d'), periods='1y')
   st.line_chart(data['Close'])
 
   # Preprocess the data in the same way as before
