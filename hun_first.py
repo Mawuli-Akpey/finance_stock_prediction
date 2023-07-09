@@ -21,7 +21,7 @@ st.title("Stock Price Predictor")
 st.write("This application predicts stock prices using a trained neural network model.")
 
 # List of tickers used for building the model
-tickers = ['AAPL', 'GOOGL', 'MSFT', 'AMZN']
+tickers = ['AAPL', 'MSFT', 'JNJ', 'PFE', 'XOM', 'CVX']
 
 # Create a dropdown menu for ticker selection
 ticker = st.selectbox('Select a stock ticker', tickers)
