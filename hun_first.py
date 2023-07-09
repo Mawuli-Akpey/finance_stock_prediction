@@ -1,3 +1,5 @@
+!pip install yfinance
+
 import yfinance as yf
 import tensorflow as tf
 import streamlit as st
