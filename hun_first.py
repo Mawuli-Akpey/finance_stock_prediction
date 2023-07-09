@@ -54,7 +54,7 @@ if st.button('Predict'):
     # Check if the selected date is a valid trading day
     if not is_trading_day(date):
         st.write('The selected date is not a valid trading day. Please select a different date.')
-        return
+        st.stop()
 
     # Download the data
     data = yf.download(ticker, end=date, periods='1y')
