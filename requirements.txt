@@ -3,3 +3,4 @@ yfinance
 tensorflow
 numpy
 pandas
+sklearn
