@@ -55,6 +55,8 @@ if st.button('Predict'):
     # Check if there are enough data points
     if len(data) < seq_length:
         st.write('Not enough historical data to make a prediction. Please select a different date.')
+        st.write(len(data))
+        st.write(seq_length)
         st.stop()
 
     # Preprocess the data
