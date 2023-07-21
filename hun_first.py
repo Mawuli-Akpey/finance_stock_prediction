@@ -48,40 +48,39 @@ month_to_number = {
     'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12
 }
 
+# Configure the page
+st.set_page_config(layout='wide')
+
 # Start of the Streamlit app
-st.write("""
-# Stock Closing Price Prediction App
-Warning: This app is for informational purposes only. Please make your financial decisions with caution.
-""")
+st.title("Stock Closing Price Prediction App")
+st.subheader("Please enter a future date to predict the closing price.")
+st.warning("This app is for informational purposes only. Please make your financial decisions with caution.")
 
-# Ask the user to input the year, month, and day
-year = st.number_input('Enter a year', min_value=2023, max_value=2030, value=2023, step=1)
-month = st.selectbox('Select a month', list(month_to_number.keys()))
-day = st.number_input('Enter a day', min_value=1, max_value=31, value=1, step=1)
-
-# Create a placeholder
-placeholder = st.empty()
+# Ask the user to input the year, month, and day in the sidebar
+with st.sidebar:
+    st.header("Input Parameters")
+    year = st.number_input('Enter a year', min_value=2023, max_value=2030, value=2023, step=1)
+    month = st.selectbox('Select a month', list(month_to_number.keys()))
+    day = st.number_input('Enter a day', min_value=1, max_value=31, value=1, step=1)
 
 # When the 'Predict' button is clicked, make the prediction
 if st.button('Predict'):
-    # Display a message while the prediction is being calculated
-    placeholder.text('Please hold on while we calculate...')
+    with st.spinner('Please hold on while we calculate...'):
+        # The start date (the date of the last known closing price)
+        start_date = most_recent_weekday()
 
-    # The start date (the date of the last known closing price)
-    start_date = most_recent_weekday()
+        # Convert the month from text to number
+        month_number = month_to_number[month]
 
-    # Convert the month from text to number
-    month_number = month_to_number[month]
+        # The future date (the date for which the user wants to predict the closing price)
+        future_date = datetime.date(year, month_number, day)
 
-    # The future date (the date for which the user wants to predict the closing price)
-    future_date = datetime.date(year, month_number, day)
+        # The initial sequence of the most recent known closing prices
+        # Replace with your actual data
+        initial_sequence = data_scaled[-sequence_length:]
 
-    # The initial sequence of the most recent known closing prices
-    # Replace with your actual data
-    initial_sequence = data_scaled[-sequence_length:]
+        # Use the function to predict the closing price for the future date
+        predicted_close_price = predict_future_close_price(gru_model, scaler, initial_sequence, future_date, start_date)
 
-    # Use the function to predict the closing price for the future date
-    predicted_close_price = predict_future_close_price(gru_model, scaler, initial_sequence, future_date, start_date)
-
-    # Overwrite the placeholder with the predicted closing price
-    placeholder.text(f"The predicted closing price for {future_date.strftime('%Y-%m-%d')} is {predicted_close_price}")
+    # Display the predicted closing price
+    st.markdown(f"## The predicted closing price for {future_date.strftime('%Y-%m-%d')} is **{predicted_close_price:.2f}**")
