@@ -59,10 +59,13 @@ year = st.number_input('Enter a year', min_value=2023, max_value=2030, value=202
 month = st.selectbox('Select a month', list(month_to_number.keys()))
 day = st.number_input('Enter a day', min_value=1, max_value=31, value=1, step=1)
 
+# Create a placeholder
+placeholder = st.empty()
+
 # When the 'Predict' button is clicked, make the prediction
 if st.button('Predict'):
     # Display a message while the prediction is being calculated
-    st.write('Please hold on while we calculate...')
+    placeholder.text('Please hold on while we calculate...')
 
     # The start date (the date of the last known closing price)
     start_date = most_recent_weekday()
@@ -73,18 +76,12 @@ if st.button('Predict'):
     # The future date (the date for which the user wants to predict the closing price)
     future_date = datetime.date(year, month_number, day)
 
-    # Check if the future date is a weekday
-    if future_date.weekday() >= 5:  # 0-4 denotes Monday-Friday
-        st.write('Error: The future date must be a weekday.')
-    elif future_date <= start_date:
-        st.write('Error: The future date must be after the most recent weekday.')
-    else:
-        # The initial sequence of the most recent known closing prices
-        # Replace with your actual data
-        initial_sequence = data_scaled[-sequence_length:]
+    # The initial sequence of the most recent known closing prices
+    # Replace with your actual data
+    initial_sequence = data_scaled[-sequence_length:]
 
-        # Use the function to predict the closing price for the future date
-        predicted_close_price = predict_future_close_price(gru_model, scaler, initial_sequence, future_date, start_date)
+    # Use the function to predict the closing price for the future date
+    predicted_close_price = predict_future_close_price(gru_model, scaler, initial_sequence, future_date, start_date)
 
-        # Display the predicted closing price
-        st.write(f"The predicted closing price for {future_date.strftime('%Y-%m-%d')} is {predicted_close_price}")
+    # Overwrite the placeholder with the predicted closing price
+    placeholder.text(f"The predicted closing price for {future_date.strftime('%Y-%m-%d')} is {predicted_close_price}")
