@@ -64,16 +64,11 @@ if st.button('Predict'):
     # The start date (the date of the last known closing price)
     start_date = most_recent_weekday()
 
-    # Convert the month from text to number
-    month_number = month_to_number[month]
-
     # The future date (the date for which the user wants to predict the closing price)
-    future_date = datetime.date(year, month_number, day.day)
+    future_date = datetime.date(year, month, day)
 
-    # Check if the future date is a weekday
-    if future_date.weekday() >= 5:  # 0-4 denotes Monday-Friday
-        st.write('Error: The future date must be a weekday.')
-    elif future_date <= start_date:
+    # Ensure future_date is after start_date
+    if future_date <= start_date:
         st.write('Error: The future date must be after the most recent weekday.')
     else:
         # The initial sequence of the most recent known closing prices
