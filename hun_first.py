@@ -1,72 +1,75 @@
-import yfinance as yf
-import tensorflow as tf
+import joblib
+
+# Load the objects from the joblib files
+data_scaled = joblib.load('data_scaled.joblib')
+sequence_length = joblib.load('sequence_length.joblib')
+gru_model = joblib.load('gru_model.joblib')
+scaler = joblib.load('scaler.joblib')
+
+
 import streamlit as st
-from keras.models import load_model
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-import pandas as pd
-import pandas_market_calendars as mcal
+import datetime
 
-# Load the trained CNN model
-model = load_model('cnn_model.h5')
+# Your function to predict the future closing price
+def predict_future_close_price(model, scaler, initial_sequence, future_date, start_date):
+    # Calculate the number of days in the future the future_date is from the start_date
+    delta_days = (future_date - start_date).days
 
-# Define the sequence length and the scaler
-seq_length = 5
-scaler = MinMaxScaler(feature_range=(0, 1))
+    # Initialize the sequence with the most recent known closing prices
+    sequence = initial_sequence
 
-st.header("My Header")
-st.subheader("Another header")
+    # Loop over each day up to the future_date
+    for _ in range(delta_days):
+        # Prepare the sequence for prediction
+        sequence_reshaped = sequence.reshape((1, sequence_length, 1))
 
-st.title("Stock Price Predictor")
-st.write("This application predicts stock prices using a trained neural network model.")
+        # Make a prediction for the next day
+        prediction_scaled = model.predict(sequence_reshaped)
 
-# List of tickers used for building the model
-tickers = ['AAPL', 'MSFT', 'JNJ', 'PFE', 'XOM', 'CVX']
+        # Append the prediction to the sequence
+        sequence = np.append(sequence[1:], prediction_scaled)
 
-# Create a dropdown menu for ticker selection
-ticker = st.selectbox('Select a stock ticker', tickers)
+    # Inverse transform the final prediction
+    prediction = scaler.inverse_transform(prediction_scaled)
 
-# Create a date picker for date selection
-date = st.date_input('Select a date for prediction')
+    return prediction[0][0]
 
-# Function to preprocess the data
-def preprocess_data(data):
-    # Scale the data
-    data = scaler.fit_transform(data.values.reshape(-1, 1))
-    
-    # Create sequences
-    X = []
-    for i in range(seq_length, len(data)):
-        X.append(data[i-seq_length:i, 0])
-    X = np.array(X)
-    
-    # Reshape the data for the CNN model
-    X = np.reshape(X, (X.shape[0], X.shape[1], 1))
-    
-    return X
+# Your function to get the most recent weekday
+def most_recent_weekday():
+    today = datetime.date.today()
+    offset = max(1, (today.weekday() + 6) % 7 - 3)
+    most_recent = today - datetime.timedelta(offset)
+    return most_recent
 
+# Start of the Streamlit app
+st.write("""
+# Stock Closing Price Prediction App
+Warning: This app is for informational purposes only. Please make your financial decisions with caution.
+""")
+
+# Ask the user to input the year, month, and day
+year = st.number_input('Enter a year', min_value=2023, max_value=2030, value=2023, step=1)
+month = st.number_input('Enter a month', min_value=1, max_value=12, value=1, step=1)
+day = st.number_input('Enter a day', min_value=1, max_value=31, value=1, step=1)
+
+# When the 'Predict' button is clicked, make the prediction
 if st.button('Predict'):
-    # Get the date 60 days before the selected date
-    start_date = date - pd.DateOffset(days=seq_length)
+    # The start date (the date of the last known closing price)
+    start_date = most_recent_weekday()
 
-    # Download the data from the start date to the selected date
-    data = yf.download(ticker, start=start_date, end=date)
-    
-    # Check if there are enough data points
-    if len(data) < seq_length:
-        st.write('Not enough historical data to make a prediction. Please select a different date.')
-        st.write(len(data))
-        st.write(seq_length)
-        st.stop()
+    # The future date (the date for which the user wants to predict the closing price)
+    future_date = datetime.date(year, month, day)
 
-    # Preprocess the data
-    data = preprocess_data(data['Close'])
+    # Ensure future_date is after start_date
+    if future_date <= start_date:
+        st.write('Error: The future date must be after the most recent weekday.')
+    else:
+        # The initial sequence of the most recent known closing prices
+        # Replace with your actual data
+        initial_sequence = data_scaled[-sequence_length:]
 
-    # Use the CNN model to predict the stock price
-    prediction = model.predict(data)
-    
-    # Convert the prediction to the original price scale
-    prediction = scaler.inverse_transform(prediction)
-    
-    # Display the prediction
-    st.write(f'The predicted stock price for {ticker} on {date} is {prediction[-1][0]}')
+        # Use the function to predict the closing price for the future date
+        predicted_close_price = predict_future_close_price(gru_model, scaler, initial_sequence, future_date, start_date)
+
+        # Display the predicted closing price
+        st.write(f"The predicted closing price for {future_date.strftime('%Y-%m-%d')} is {predicted_close_price}")
