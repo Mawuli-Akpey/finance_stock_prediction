@@ -1,7 +1,6 @@
 streamlit
-yfinance
-tensorflow
 numpy
+pandas
+joblib
 scikit-learn
-matplotlib
-pandas_market_calendars
+tensorflow
