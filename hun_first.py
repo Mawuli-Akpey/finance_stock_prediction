@@ -53,7 +53,7 @@ st.set_page_config(layout='wide')
 
 # Start of the Streamlit app
 st.title("Stock Closing Price Prediction App")
-st.subheader("Please enter a future date to predict the closing price.")
+st.subheader("Please enter a future date to predict the closing price for Microsoft Stocks")
 st.warning("This app is for informational purposes only. Please make your financial decisions with caution.")
 
 # Ask the user to input the year, month, and day in the sidebar
