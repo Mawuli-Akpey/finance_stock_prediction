@@ -9,6 +9,7 @@ scaler = joblib.load('scaler.joblib')
 
 import streamlit as st
 import datetime
+import numpy as np
 
 # Your function to predict the future closing price
 def predict_future_close_price(model, scaler, initial_sequence, future_date, start_date):
