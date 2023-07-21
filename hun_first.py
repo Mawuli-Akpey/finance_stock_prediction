@@ -57,7 +57,7 @@ Warning: This app is for informational purposes only. Please make your financial
 # Ask the user to input the year, month, and day
 year = st.number_input('Enter a year', min_value=2023, max_value=2030, value=2023, step=1)
 month = st.selectbox('Select a month', list(month_to_number.keys()))
-day = st.date_input('Select a day')
+day = st.number_input('Enter a day', min_value=1, max_value=31, value=1, step=1)
 
 # When the 'Predict' button is clicked, make the prediction
 if st.button('Predict'):
