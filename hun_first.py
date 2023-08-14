@@ -11,6 +11,15 @@ import streamlit as st
 import datetime
 import numpy as np
 
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
 # Your function to predict the future closing price
 def predict_future_close_price(model, scaler, initial_sequence, future_date, start_date):
     # Calculate the number of days in the future the future_date is from the start_date
